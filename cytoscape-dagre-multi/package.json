@@ -1,12 +1,11 @@
 {
   "_args": [
     [
-      "cytoscape-dagre-multi@2.2.2",
+      "cytoscape-dagre-multi@1.0.0",
       "H:\\DNAMAPGL\\dmultilayer\\cytoscape-testbed\\frontend"
     ]
   ],
-  "_from": "cytoscape-dagre-multi@2.2.2",
-  "_id": "cytoscape-dagre-multi@2.2.2",
+  "_from": "cytoscape-dagre-multi@1.0.0",
   "_inBundle": false,
   "_integrity": "sha512-zsg36qNwua/L2stJSWkcbSDcvW3E6VZf6KRe6aLnQJxuXuz89tMqI5EVYVKEcNBgzTEzFMFv0PE3T0nD4m6VDw==",
   "_location": "/cytoscape-dagre-multi",
@@ -14,25 +13,22 @@
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "cytoscape-dagre-multi@2.2.2",
+    "raw": "cytoscape-dagre-multi@1.0.0",
     "name": "cytoscape-dagre-multi",
     "escapedName": "cytoscape-dagre-multi",
-    "rawSpec": "2.2.2",
+    "rawSpec": "1.0.0",
     "saveSpec": null,
-    "fetchSpec": "2.2.2"
+    "fetchSpec": "1.0.0"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cytoscape-dagre-multi/-/cytoscape-dagre-multi-2.2.2.tgz",
-  "_spec": "2.2.2",
+  "_spec": "1.0.0",
   "_where": "H:\\DNAMAPGL\\dmultilayer\\cytoscape-testbed\\frontend",
-  "author": {
-    "name": "Max Franz",
-    "email": "maxkfranz@gmail.com"
-  },
+  "author": "Max Franz <maxkfranz@gmail.com>",
   "bugs": {
-    "url": "https://github.com/cytoscape/cytoscape.js-dagre-multi/issues"
+    "url": "https://eac-fs-0.host.ualr.edu/zdbolt/cytoscape-dagre-multi.git/issues"
   },
   "dependencies": {
     "dagre": "^0.8.2"
@@ -56,7 +52,7 @@
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.4.5"
   },
-  "homepage": "https://github.com/cytoscape/cytoscape.js-dagre-multi",
+  "homepage": "https://eac-fs-0.host.ualr.edu/zdbolt/cytoscape-dagre-multi",
   "keywords": [
     "cytoscape",
     "cytoscape-extension"
@@ -69,7 +65,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cytoscape/cytoscape.js-dagre-multi.git"
+    "url": "git+https://eac-fs-0.host.ualr.edu/zdbolt/cytoscape-dagre-multi.git"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
@@ -85,5 +81,8 @@
     "test": "mocha",
     "watch": "webpack --progress --watch"
   },
-  "version": "2.2.2"
+  "version": "1.0.0",
+  "directories": {
+    "test": "test"
+  }
 }
