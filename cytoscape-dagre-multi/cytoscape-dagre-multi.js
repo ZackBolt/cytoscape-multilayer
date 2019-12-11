@@ -235,6 +235,8 @@ DagreLayout.prototype.run = function () {
     }
   };
 
+  const nearest_sqrt = n => Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
+
   nodes.layoutPositions(layout, options, function (ele) {
     ele = (typeof ele === 'undefined' ? 'undefined' : _typeof(ele)) === "object" ? ele : this;
     var dModel = ele.scratch().dagre;
@@ -246,36 +248,79 @@ DagreLayout.prototype.run = function () {
   });
   //   this._private.cy.elements().roots()
 	var maxWidth = 6000;
-    var roots = this._private.cy.elements().roots();
-    var move = true;
+  var roots = this._private.cy.elements().roots();
+  var move = true;
+  for (var i = 0; i < roots.size(); i++)
+  {
+    var successors = roots[i].successors();
+    if (successors.size()>0)
+    {
+      var nodesPerColumn = nearest_sqrt(successors.size());
+      var topLeftSuccessorY = roots[i]._private.position.y + nodesPerColumn*35;
+      var topLeftSuccessorX = roots[i]._private.position.x - (35*(successors.size()/nodesPerColumn)); //nodesPerColumn is sqrt rounded down
+      var j = 0;
+      var row = 0;
+      while (j<successors.size())
+      {
+        for (var k = 0; k < nodesPerColumn && (j<successors.size()); k++)
+        {
+          successors[j].position('y', topLeftSuccessorY + k*35);
+          successors[j].position('x', topLeftSuccessorX + (100*row));
+          j++;
+        }
+        row++;
+      }
+    }
+
+  }
+  
 
 	while(move) {
+    console.log(move);
 		this._private.cy.elements().scratch('moved', false);
 		for (var i = 0; i < roots.size(); i++) {
-			if (roots[i]._private.scratch.moved !== true) {
-				var successors = roots[i].successors();
-				move = false;
+      var rightNodeX = roots[i]._private.position.x;
+      var leftNodeX = roots[i]._private.position.x;
+      var successors = roots[i].successors();
+      if (roots[i]._private.scratch.moved !== true) {          
+        if (roots[i]._private.position.x > maxWidth && 
+          (roots[i]._private.position.x - maxWidth) > 0)
+          move = true;
+        else
+          move = false;
 				if (successors.size() > 0){
 					for (var j = 0; j < successors.size(); j++) {
-						if (successors[j]._private.position.x > maxWidth) {
-							move = true;
-						}
-					}
+            if (successors[j]._private.position.x > rightNodeX)
+            {
+              rightNodeX = successors[j]._private.position.x;
+            }
+            if (successors[j]._private.position.x < leftNodeX)
+            {
+              leftNodeX = successors[j]._private.position.x;
+            }
+          }
+          if (rightNodeX > maxWidth && (leftNodeX - maxWidth> 0))
+            move = true;
 					if (move) {
 						roots[i].shift({x: -maxWidth, y: 500})
-						roots[i].scratch('moved', true);
-						for (var k = 0; k < successors.size(); k++) {
-							if (successors[k]._private.scratch.moved !== true) {
-								successors[k].shift({x: -maxWidth, y: 500})
-								successors[k].scratch('moved', true);
+            roots[i].scratch('moved', true);
+            if (successors.size() > 0){
+						  for (var k = 0; k < successors.size(); k++) {
+							  if (successors[k]._private.scratch.moved !== true) {
+							  	successors[k].shift({x: -maxWidth, y: 500})
+                  successors[k].scratch('moved', true);
+                }
 							}
 						}
 					}   
 				}
 			}
 		}
-	}
-        
+  }
+  
+      console.log(roots);
+      console.log(70+this.options.padding);
+
 	this._private.cy.fit();
 		
   return this; // chaining
