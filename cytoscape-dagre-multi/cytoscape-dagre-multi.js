@@ -276,7 +276,7 @@ DagreLayout.prototype.run = function () {
   
 
 	while(move) {
-    console.log(move);
+    //console.log(move);
 		this._private.cy.elements().scratch('moved', false);
 		for (var i = 0; i < roots.size(); i++) {
       var rightNodeX = roots[i]._private.position.x;
@@ -303,13 +303,15 @@ DagreLayout.prototype.run = function () {
             move = true;
 					if (move) {
 						roots[i].shift({x: -maxWidth, y: 500})
-            roots[i].scratch('moved', true);
-            if (successors.size() > 0){
+						roots[i].scratch('moved', true);
+						console.log(roots[i]._private.data.id);
+						if (successors.size() > 0){
 						  for (var k = 0; k < successors.size(); k++) {
 							  if (successors[k]._private.scratch.moved !== true) {
 							  	successors[k].shift({x: -maxWidth, y: 500})
-                  successors[k].scratch('moved', true);
-                }
+								successors[k].scratch('moved', true);
+								successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
+								}
 							}
 						}
 					}   
@@ -318,11 +320,37 @@ DagreLayout.prototype.run = function () {
 		}
   }
   
-      console.log(roots);
-      console.log(70+this.options.padding);
+     //console.log(roots);
 
 	this._private.cy.fit();
-		
+	
+	for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
+	{
+		var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
+		var maxX = roots[i]._private.bodyBounds.x2; //uses the root node's bounding box to start with
+		var minY = roots[i]._private.bodyBounds.y1;
+		var maxY = roots[i]._private.bodyBounds.y2;
+		successors = roots[i].successors();
+		for (var k = 0; k < successors.size(); k++)
+		{
+			if (successors[k]._private.scratch.root == roots[i]._private.data.id) //if successor has this root node recorded as 'root'  in scratch
+			{
+				if (minX == null || successors[k]._private.bodyBounds.x1 < minX)
+					minX = successors[k]._private.bodyBounds.x1;
+				if (maxX == null || successors[k]._private.bodyBounds.x2 < maxX)
+					maxX = successors[k]._private.bodyBounds.x2;
+				if (minY == null || successors[k]._private.bodyBounds.y1 < minY)
+					minY = successors[k]._private.bodyBounds.y1;
+				if (maxY == null || successors[k]._private.bodyBounds.y2 < maxY)
+					maxY = successors[k]._private.bodyBounds.y2;
+			}
+			roots[i].scratch('minX', minX); //add bounding box attributes to scratch for the root
+			roots[i].scratch('maxX', maxX);
+			roots[i].scratch('minY', minY);
+			roots[i].scratch('manX', maxY);
+		}
+//		console.log(roots);
+	}	
   return this; // chaining
 };
 
