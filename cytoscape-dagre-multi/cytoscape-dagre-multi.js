@@ -7,7 +7,7 @@
 		exports["cytoscapeDagreMulti"] = factory(require("dagre"));
 	else
 		root["cytoscapeDagreMulti"] = factory(root["dagre"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_4__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -81,8 +81,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var isFunction = function isFunction(o) {
@@ -90,7 +88,8 @@ var isFunction = function isFunction(o) {
 };
 var defaults = __webpack_require__(2);
 var assign = __webpack_require__(1);
-var dagre = __webpack_require__(4);
+var dagre = __webpack_require__(5);
+var potpack = __webpack_require__(4);
 
 // constructor
 // options : object containing layout options
@@ -235,7 +234,9 @@ DagreLayout.prototype.run = function () {
     }
   };
 
-  const nearest_sqrt = n => Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
+  var nearest_sqrt = function nearest_sqrt(n) {
+    return Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
+  };
 
   nodes.layoutPositions(layout, options, function (ele) {
     ele = (typeof ele === 'undefined' ? 'undefined' : _typeof(ele)) === "object" ? ele : this;
@@ -247,110 +248,117 @@ DagreLayout.prototype.run = function () {
     });
   });
   //   this._private.cy.elements().roots()
-	var maxWidth = 6000;
+  var maxWidth = 6000;
   var roots = this._private.cy.elements().roots();
-  var move = true;
-  for (var i = 0; i < roots.size(); i++)
-  {
+
+  this._private.cy.elements().scratch('moved', false);
+  for (var i = 0; i < roots.size(); i++) {
+    //don't allow the roots to move as successors
+    roots[i].scratch('moved', true);
+  }for (var i = 0; i < roots.size(); i++) {
+    //label each successor with the id of one of it's parents
     var successors = roots[i].successors();
-    if (successors.size()>0)
-    {
+    if (successors.size() > 0) {
+      for (var k = 0; k < successors.size(); k++) {
+        if (successors[k]._private.scratch.moved !== true) {
+          successors[k].scratch('moved', true);
+          successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
+        }
+      }
+    }
+  }
+
+  for (var i = 0; i < roots.size(); i++) {
+    var successors = roots[i].successors();
+    if (successors.size() > 0) {
       var nodesPerColumn = nearest_sqrt(successors.size());
-      var topLeftSuccessorY = roots[i]._private.position.y + nodesPerColumn*35;
-      var topLeftSuccessorX = roots[i]._private.position.x - (35*(successors.size()/nodesPerColumn)); //nodesPerColumn is sqrt rounded down
+      var topLeftSuccessorY = roots[i]._private.position.y + nodesPerColumn * 20;
+      var topLeftSuccessorX = roots[i]._private.position.x - 45 * (successors.size() / nodesPerColumn); //nodesPerColumn is sqrt rounded down
       var j = 0;
       var row = 0;
-      while (j<successors.size())
-      {
-        for (var k = 0; k < nodesPerColumn && (j<successors.size()); k++)
-        {
-          successors[j].position('y', topLeftSuccessorY + k*35);
-          successors[j].position('x', topLeftSuccessorX + (100*row));
+      while (j < successors.size()) {
+        for (var k = 0; k < nodesPerColumn && j < successors.size(); k++) {
+          if (successors[j]._private.scratch.root == roots[i]._private.data.id) {
+            successors[j].position('y', topLeftSuccessorY + k * 45);
+            successors[j].position('x', topLeftSuccessorX + 130 * row);
+            successors[j].scratch('x1', topLeftSuccessorX + 130 * row - 16); //update bodybounds));
+            successors[j].scratch('x2', topLeftSuccessorX + 130 * row + 16); //update bodybounds));
+            successors[j].scratch('y1', topLeftSuccessorY + k * 45 - 16);
+            successors[j].scratch('y2', topLeftSuccessorY + k * 45 + 16);
+          }
           j++;
         }
         row++;
       }
     }
-
   }
-  
 
-	while(move) {
-    //console.log(move);
-		this._private.cy.elements().scratch('moved', false);
-		for (var i = 0; i < roots.size(); i++) {
-      var rightNodeX = roots[i]._private.position.x;
-      var leftNodeX = roots[i]._private.position.x;
-      var successors = roots[i].successors();
-      if (roots[i]._private.scratch.moved !== true) {          
-        if (roots[i]._private.position.x > maxWidth && 
-          (roots[i]._private.position.x - maxWidth) > 0)
-          move = true;
-        else
-          move = false;
-				if (successors.size() > 0){
-					for (var j = 0; j < successors.size(); j++) {
-            if (successors[j]._private.position.x > rightNodeX)
-            {
-              rightNodeX = successors[j]._private.position.x;
-            }
-            if (successors[j]._private.position.x < leftNodeX)
-            {
-              leftNodeX = successors[j]._private.position.x;
-            }
-          }
-          if (rightNodeX > maxWidth && (leftNodeX - maxWidth> 0))
-            move = true;
-					if (move) {
-						roots[i].shift({x: -maxWidth, y: 500})
-						roots[i].scratch('moved', true);
-						console.log(roots[i]._private.data.id);
-						if (successors.size() > 0){
-						  for (var k = 0; k < successors.size(); k++) {
-							  if (successors[k]._private.scratch.moved !== true) {
-							  	successors[k].shift({x: -maxWidth, y: 500})
-								successors[k].scratch('moved', true);
-								successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
-								}
-							}
-						}
-					}   
-				}
-			}
-		}
+  //console.log(roots);
+
+  console.log(roots);
+  for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
+  {
+    var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
+    var maxX = roots[i]._private.bodyBounds.x2; //uses the root node's bounding box to start with
+    var minY = roots[i]._private.bodyBounds.y1;
+    var maxY = roots[i]._private.bodyBounds.y2;
+    successors = roots[i].successors();
+    for (var k = 0; k < successors.size(); k++) {
+      if (successors[k]._private.scratch.root == roots[i]._private.data.id) //if successor has this root node recorded as 'root'  in scratch
+        {
+          if (successors[k]._private.scratch.x1 < minX) minX = successors[k]._private.scratch.x1;
+          if (successors[k]._private.scratch.x2 > maxX) maxX = successors[k]._private.scratch.x2;
+          if (successors[k]._private.scratch.y1 < minY) minY = successors[k]._private.scratch.y1;
+          if (successors[k]._private.scratch.y2 > maxY) maxY = successors[k]._private.scratch.y2;
+        }
+    }
+    roots[i].scratch('minX', minX); //add bounding box attributes to scratch for the root
+    roots[i].scratch('maxX', maxX);
+    roots[i].scratch('minY', minY);
+    roots[i].scratch('maxY', maxY);
   }
-  
-     //console.log(roots);
+  //Rectangle packing here
+  var boxes = [];
+  for (var i = 0; i < roots.size(); i++) {
+    //create structure for potpack module
+    boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY, root: i }); //potpack reorders the list so adding indicator for original root
+  }
 
-	this._private.cy.fit();
-	
-	for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
-	{
-		var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
-		var maxX = roots[i]._private.bodyBounds.x2; //uses the root node's bounding box to start with
-		var minY = roots[i]._private.bodyBounds.y1;
-		var maxY = roots[i]._private.bodyBounds.y2;
-		successors = roots[i].successors();
-		for (var k = 0; k < successors.size(); k++)
-		{
-			if (successors[k]._private.scratch.root == roots[i]._private.data.id) //if successor has this root node recorded as 'root'  in scratch
-			{
-				if (minX == null || successors[k]._private.bodyBounds.x1 < minX)
-					minX = successors[k]._private.bodyBounds.x1;
-				if (maxX == null || successors[k]._private.bodyBounds.x2 < maxX)
-					maxX = successors[k]._private.bodyBounds.x2;
-				if (minY == null || successors[k]._private.bodyBounds.y1 < minY)
-					minY = successors[k]._private.bodyBounds.y1;
-				if (maxY == null || successors[k]._private.bodyBounds.y2 < maxY)
-					maxY = successors[k]._private.bodyBounds.y2;
-			}
-			roots[i].scratch('minX', minX); //add bounding box attributes to scratch for the root
-			roots[i].scratch('maxX', maxX);
-			roots[i].scratch('minY', minY);
-			roots[i].scratch('manX', maxY);
-		}
-//		console.log(roots);
-	}	
+  var _potpack$default = potpack.default(boxes),
+      w = _potpack$default.w,
+      h = _potpack$default.h,
+      fill = _potpack$default.fill;
+
+  console.log(boxes);
+
+  for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
+  {
+    for (var j = 0; j < boxes.length; j++) {
+      if (boxes[j].root == i) {
+        var moveX = boxes[j].x - roots[i]._private.position.x;
+        var moveY = boxes[j].y - roots[i]._private.position.y;
+        roots[i].shift({ x: moveX, y: moveY });
+        successors = roots[i].successors();
+        for (var k = 0; k < successors.size(); k++) {
+          if (successors[k]._private.scratch.root == roots[i]._private.data.id) //if successor has this root node recorded as 'root'  in scratch
+            {
+              successors[k].shift({ x: moveX, y: moveY });
+            }
+        }
+      }
+    }
+  }
+  var j = cy.$('#j');
+
+  this._private.cy.animate({
+    fit: {
+      eles: j,
+      padding: 20
+    }
+  }, {
+    duration: 1000
+  });
+  this._private.cy.resize();
   return this; // chaining
 };
 
@@ -449,9 +457,112 @@ module.exports = register;
 
 /***/ }),
 /* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["default"] = potpack;
+
+function potpack(boxes) {
+
+    // calculate total box area and maximum box width
+    let area = 0;
+    let maxWidth = 0;
+
+    for (const box of boxes) {
+        area += box.w * box.h;
+        maxWidth = Math.max(maxWidth, box.w);
+    }
+
+    // sort the boxes for insertion by height, descending
+    boxes.sort((a, b) => b.h - a.h);
+
+    // aim for a squarish resulting container,
+    // slightly adjusted for sub-100% space utilization
+    const startWidth = Math.max(Math.ceil(Math.sqrt(area / 0.95)), maxWidth);
+
+    // start with a single empty space, unbounded at the bottom
+    const spaces = [{x: 0, y: 0, w: startWidth, h: Infinity}];
+
+    let width = 0;
+    let height = 0;
+
+    for (const box of boxes) {
+        // look through spaces backwards so that we check smaller spaces first
+        for (let i = spaces.length - 1; i >= 0; i--) {
+            const space = spaces[i];
+
+            // look for empty spaces that can accommodate the current box
+            if (box.w > space.w || box.h > space.h) continue;
+
+            // found the space; add the box to its top-left corner
+            // |-------|-------|
+            // |  box  |       |
+            // |_______|       |
+            // |         space |
+            // |_______________|
+            box.x = space.x;
+            box.y = space.y;
+
+            height = Math.max(height, box.y + box.h);
+            width = Math.max(width, box.x + box.w);
+
+            if (box.w === space.w && box.h === space.h) {
+                // space matches the box exactly; remove it
+                const last = spaces.pop();
+                if (i < spaces.length) spaces[i] = last;
+
+            } else if (box.h === space.h) {
+                // space matches the box height; update it accordingly
+                // |-------|---------------|
+                // |  box  | updated space |
+                // |_______|_______________|
+                space.x += box.w;
+                space.w -= box.w;
+
+            } else if (box.w === space.w) {
+                // space matches the box width; update it accordingly
+                // |---------------|
+                // |      box      |
+                // |_______________|
+                // | updated space |
+                // |_______________|
+                space.y += box.h;
+                space.h -= box.h;
+
+            } else {
+                // otherwise the box splits the space into two spaces
+                // |-------|-----------|
+                // |  box  | new space |
+                // |_______|___________|
+                // | updated space     |
+                // |___________________|
+                spaces.push({
+                    x: space.x + box.w,
+                    y: space.y,
+                    w: space.w - box.w,
+                    h: box.h
+                });
+                space.y += box.h;
+                space.h -= box.h;
+            }
+            break;
+        }
+    }
+
+    return {
+        w: width, // container width
+        h: height, // container height
+        fill: (area / (width * height)) || 0 // space utilization
+    };
+}
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
 
 /***/ })
 /******/ ]);
