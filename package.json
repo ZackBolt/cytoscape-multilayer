@@ -1,11 +1,11 @@
 {
   "_args": [
     [
-      "cytoscape-dagre-multi@1.0.1",
+      "cytoscape-dagre-multi@1.0.2",
       "H:\\DNAMAPGL\\dmultilayer\\cytoscape-testbed\\frontend"
     ]
   ],
-  "_from": "cytoscape-dagre-multi@1.0.1",
+  "_from": "cytoscape-dagre-multi@1.0.2",
   "_inBundle": false,
   "_integrity": "sha512-zsg36qNwua/L2stJSWkcbSDcvW3E6VZf6KRe6aLnQJxuXuz89tMqI5EVYVKEcNBgzTEzFMFv0PE3T0nD4m6VDw==",
   "_location": "/cytoscape-dagre-multi",
@@ -13,18 +13,18 @@
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "cytoscape-dagre-multi@1.0.1",
+    "raw": "cytoscape-dagre-multi@1.0.2",
     "name": "cytoscape-dagre-multi",
     "escapedName": "cytoscape-dagre-multi",
-    "rawSpec": "1.0.1",
+    "rawSpec": "1.0.2",
     "saveSpec": null,
-    "fetchSpec": "1.0.1"
+    "fetchSpec": "1.0.2"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cytoscape-dagre-multi/-/cytoscape-dagre-multi-2.2.2.tgz",
-  "_spec": "1.0.1",
+  "_spec": "1.0.2",
   "_where": "H:\\DNAMAPGL\\dmultilayer\\cytoscape-testbed\\frontend",
   "author": "Zack Bolt <zdbolt@ualr.edu> previously by Max Franz",
   "bugs": {
@@ -80,7 +80,7 @@
     "postpublish": "run-s gh-pages:demo gh-pages:deploy gh-pages:clean",
     "watch": "webpack --progress --watch"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "directories": {
     "test": "test"
   }
