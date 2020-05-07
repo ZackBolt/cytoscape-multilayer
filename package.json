@@ -45,7 +45,6 @@
     "cross-env": "^5.0.0",
     "eslint": "^3.9.1",
     "gh-pages": "^1.0.0",
-    "mocha": "3.4.2",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
     "update": "^0.7.4",
@@ -79,7 +78,6 @@
     "gh-pages:deploy": "gh-pages -d . -v node_modules/**",
     "lint": "eslint src",
     "postpublish": "run-s gh-pages:demo gh-pages:deploy gh-pages:clean",
-    "test": "mocha",
     "watch": "webpack --progress --watch"
   },
   "version": "1.0.1",
