@@ -162,7 +162,6 @@ DagreLayout.prototype.run = function(){
 	var maxWidth = 6000;
 	var roots = this._private.cy.elements().roots();
 	
-	
 	this._private.cy.elements().scratch('moved', false);
 	for (var i = 0; i < roots.size();i++) //don't allow the roots to move as successors
 		roots[i].scratch('moved', true);
@@ -266,17 +265,8 @@ DagreLayout.prototype.run = function(){
 				}
 			}
 	}
-	var j = cy.$('#j');
 
-	this._private.cy.animate({
-	fit: {
-    eles: j,
-    padding: 20
-  }
-}, {
-  duration: 1000
-});
-	this._private.cy.resize()
+  //this._private.cy.fit();
   return this; // chaining
 };
 

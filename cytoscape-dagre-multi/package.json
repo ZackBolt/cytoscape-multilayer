@@ -31,7 +31,8 @@
     "url": "https://eac-fs-0.host.ualr.edu/zdbolt/cytoscape-dagre-multi.git/issues"
   },
   "dependencies": {
-    "dagre": "^0.8.2"
+    "dagre": "^0.8.2",
+    "potpack": "^1.0.1"
   },
   "description": "The Dagre layout for DAGs and trees for Cytoscape.js",
   "devDependencies": {
