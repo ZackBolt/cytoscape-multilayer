@@ -150,7 +150,7 @@ DagreLayout.prototype.run = function(){
   const nearest_sqrt = n => Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
 
   nodes.layoutPositions(layout, options, function (ele) {
-    ele = (typeof ele === 'undefined' ? 'undefined' : _typeof(ele)) === "object" ? ele : this;
+    ele = typeof ele === "object" ? ele : this;
     var dModel = ele.scratch().dagre;
 
     return constrainPos({

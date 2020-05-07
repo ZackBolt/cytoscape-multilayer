@@ -81,6 +81,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var isFunction = function isFunction(o) {
@@ -250,16 +252,7 @@ DagreLayout.prototype.run = function () {
   //   this._private.cy.elements().roots()
   var maxWidth = 6000;
   var roots = this._private.cy.elements().roots();
-	/* //enable to utilize taxi style layout
-	this._private.cy.style()
-  .selector('edge')
-    .style({
-      'curve-style': 'taxi',
-	  'direction': 'upward'
-    })
-	.update() // indicate the end of your new stylesheet so that it can be updated on elements
-;
-	*/
+
   this._private.cy.elements().scratch('moved', false);
   for (var i = 0; i < roots.size(); i++) {
     //don't allow the roots to move as successors
@@ -304,7 +297,7 @@ DagreLayout.prototype.run = function () {
 
   //console.log(roots);
 
-  console.log(roots);
+  //console.log(roots);
   for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
   {
     var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
@@ -337,8 +330,7 @@ DagreLayout.prototype.run = function () {
       w = _potpack$default.w,
       h = _potpack$default.h,
       fill = _potpack$default.fill;
-
-  console.log(boxes);
+  //console.log(boxes);	
 
   for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
   {
