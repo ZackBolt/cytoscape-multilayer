@@ -106,6 +106,8 @@ N.b. all builds use babel, so modern ES features can be used in the `src`.
 
   To rebuild the `cytoscape-dagre-multi.js` library - `my-other-package` automatically picks up the updated library.
 
+* Alternatively run `npm run watch` in `cytoscape-dagre-multi.js` to automatically rebuild on every file save.
+
 ## Publishing instructions
 
 This project is set up to automatically be published to npm.  To publish:
