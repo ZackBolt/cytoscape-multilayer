@@ -210,7 +210,7 @@ DagreLayout.prototype.run = function(){
   
      //console.log(roots);
 
-	console.log(roots);
+	//console.log(roots);
 	for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
 	{
 		var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
@@ -245,7 +245,7 @@ DagreLayout.prototype.run = function(){
 		
 	
 	const {w, h, fill} = potpack.default(boxes);
-	console.log(boxes);	
+	//console.log(boxes);	
 	
 	for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
 	{

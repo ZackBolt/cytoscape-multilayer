@@ -250,7 +250,16 @@ DagreLayout.prototype.run = function () {
   //   this._private.cy.elements().roots()
   var maxWidth = 6000;
   var roots = this._private.cy.elements().roots();
-
+	/* //enable to utilize taxi style layout
+	this._private.cy.style()
+  .selector('edge')
+    .style({
+      'curve-style': 'taxi',
+	  'direction': 'upward'
+    })
+	.update() // indicate the end of your new stylesheet so that it can be updated on elements
+;
+	*/
   this._private.cy.elements().scratch('moved', false);
   for (var i = 0; i < roots.size(); i++) {
     //don't allow the roots to move as successors
