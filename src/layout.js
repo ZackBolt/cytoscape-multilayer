@@ -26,9 +26,9 @@ DagreLayout.prototype.run = function(){
               "text-valign": "center",
               color: "#eceff4",
               "text-outline-color": "#3b4252",
-              "text-outline-opacity": "1",
+              "text-outline-opacity": "0.75",
               "text-wrap": "ellipsis",
-              "text-max-width": "100px",
+              "text-max-width": "250px",
               "text-outline-width": "2px"
             }
           },
@@ -276,7 +276,7 @@ DagreLayout.prototype.run = function(){
           if (n > 0) {
             var nodesPerColumn = nearest_sqrt(n - sharedCount);
             var topLeftSuccessorY = roots[i]._private.position.y + 100;
-            var topLeftSuccessorX = roots[i]._private.position.x - 50; //nodesPerColumn is sqrt rounded down
+            var topLeftSuccessorX = roots[i]._private.position.x;			//nodesPerColumn is sqrt rounded down
             var j = 0;
             var row = 0;
             var firstNode = true;
@@ -287,9 +287,9 @@ DagreLayout.prototype.run = function(){
                   !containInPrevRoot(nodes[j]._private.data.id, roots)
                 ) {
                   nodes[j].position("y", topLeftSuccessorY + k * 100);
-                  nodes[j].position("x", topLeftSuccessorX + 100 * row);
-                  nodes[j].scratch("x1", topLeftSuccessorX + 100 * row); //update bodybounds));
-                  nodes[j].scratch("x2", topLeftSuccessorX + 100 * row); //update bodybounds));
+                  nodes[j].position("x", topLeftSuccessorX + 200 * row);
+                  nodes[j].scratch("x1", topLeftSuccessorX + 200 * row); //update bodybounds));
+                  nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
                   nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
                   nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
                   roots[i].scratch("xMax", nodes[j]._private.position.x);
@@ -373,7 +373,7 @@ DagreLayout.prototype.run = function(){
 	//Rectangle packing here
 	var boxes = [];
 	for (var i = 0; i < roots.size(); i++) { //create structure for potpack module
-		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX) + 100, h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY) + 100, root: i}); //potpack reorders the list so adding indicator for original root
+		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX) + 150, h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY) + 150, root: i}); //potpack reorders the list so adding indicator for original root
 		}
 		
 	
