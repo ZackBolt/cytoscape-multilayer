@@ -16,6 +16,50 @@ DagreLayout.prototype.run = function(){
   var layout = this;
 
   var cy = options.cy; // cy is automatically populated for us in the constructor
+  
+          cy.style([
+          {
+            selector: "node",
+            style: {
+              "background-color": "#3b4252",
+              label: "data(label)",
+              "text-valign": "center",
+              color: "#eceff4",
+              "text-outline-color": "#3b4252",
+              "text-outline-opacity": "1",
+              "text-wrap": "ellipsis",
+              "text-max-width": "100px",
+              "text-outline-width": "2px"
+            }
+          },
+          {
+            selector: "edge",
+            style: {
+              width: 3,
+              "target-arrow-shape": "triangle",
+              "line-color": "#88c0d0",
+              "target-arrow-color": "#88c0d0",
+              "curve-style": "taxi",
+              "taxi-direction": "downward",
+              "taxi-turn": "-59px"
+            }
+          }
+        ]);
+
+        // Colors for node selection
+        let color = {
+          node: {
+            root: {
+              selected: "#bf616a",
+              notSelected: "#3b4252"
+            },
+            child: {
+              selected: "#a3be8c",
+              notSelected: "#3b4252"
+            }
+          }
+        };
+  
   var eles = options.eles;
 
   var getVal = function getVal(ele, val) {
@@ -177,8 +221,94 @@ DagreLayout.prototype.run = function(){
 			}
 		}
 	}
+  //caleb's code here
+          for (var i = 0; i < roots.size(); i++) {
+          var successors = roots[i].successors();
+          var edges = roots[i].successors();
+          var n = 0,
+            nodeCount = 0;
 
-  for (var i = 0; i < roots.size(); i++)
+          for (var m = 0; m < successors.size(); m++) {
+            if (successors[m]._private.group == "nodes") {
+              successors[n] = successors[m];
+              n++;
+            } else if (successors[m]._private.group == "edges") {
+              edges[n] = edges[m];
+              nodeCount++;
+            }
+          }
+
+          nodes = successors.slice(0, n + 1);
+          edges = edges.slice(0, nodeCount + 1);
+          var containInPrevRoot = (targetID, roots) => {
+            for (var b = 0; b < i; b++) {
+              let successors = roots[b].successors();
+              for (var a = 0; a < successors.size(); a++) {
+                if (successors[a]._private.data.id == targetID) {
+                  roots[b]._private.scratch.prevSharedNodes += 1;
+                  return true;
+                }
+              }
+            }
+            return false;
+          };
+
+          var sharedCount = 0;
+		  
+ // If node appears in prev roots, it sets current root to node as bezier curve
+          for (var x = 0; x < nodeCount; x++) {
+            if (i > 0) {
+              let successors = roots[i - 1].successors();
+              for (var a = 0; a < successors.size(); a++) {
+                if (
+                  successors[a]._private.data.id ==
+                  edges[x]._private.data.target
+                ) {
+                  sharedCount++;
+                }
+              }
+            }
+            if (containInPrevRoot(edges[x]._private.data.target, roots)) {
+              edges[x].style("curve-style", "unbundled-bezier");
+            }
+          }
+
+          if (n > 0) {
+            var nodesPerColumn = nearest_sqrt(n - sharedCount);
+            var topLeftSuccessorY = roots[i]._private.position.y + 100;
+            var topLeftSuccessorX = roots[i]._private.position.x - 50; //nodesPerColumn is sqrt rounded down
+            var j = 0;
+            var row = 0;
+            var firstNode = true;
+            while (j < n) {
+              for (var k = 0; k < nodesPerColumn && j < n; k++) {
+                if (
+                  nodes[j]._private.scratch.root == roots[i]._private.data.id &&
+                  !containInPrevRoot(nodes[j]._private.data.id, roots)
+                ) {
+                  nodes[j].position("y", topLeftSuccessorY + k * 100);
+                  nodes[j].position("x", topLeftSuccessorX + 100 * row);
+                  nodes[j].scratch("x1", topLeftSuccessorX + 100 * row); //update bodybounds));
+                  nodes[j].scratch("x2", topLeftSuccessorX + 100 * row); //update bodybounds));
+                  nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
+                  nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
+                  roots[i].scratch("xMax", nodes[j]._private.position.x);
+                  if (firstNode) {
+                    roots[i].scratch("xMin", nodes[j]._private.position.x);
+                    firstNode = false;
+                  }
+                } else {
+                  k--;
+                }
+                j++;
+              }
+              row++;
+            }
+          }
+        }
+		
+		//caleb's code ends
+/*  for (var i = 0; i < roots.size(); i++)
 	{
     var successors = roots[i].successors();
     if (successors.size()>0)
@@ -207,6 +337,7 @@ DagreLayout.prototype.run = function(){
       }
     }
   }
+  */
   
      //console.log(roots);
 
@@ -237,10 +368,12 @@ DagreLayout.prototype.run = function(){
 		roots[i].scratch('minY', minY);
 		roots[i].scratch('maxY', maxY);
 	}
+	//curve styling here
+	
 	//Rectangle packing here
 	var boxes = [];
 	for (var i = 0; i < roots.size(); i++) { //create structure for potpack module
-		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX), h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY), root: i}); //potpack reorders the list so adding indicator for original root
+		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX) + 100, h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY) + 100, root: i}); //potpack reorders the list so adding indicator for original root
 		}
 		
 	
@@ -267,6 +400,7 @@ DagreLayout.prototype.run = function(){
 	}
 
   //this._private.cy.fit();
+   
   return this; // chaining
 };
 
