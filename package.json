@@ -80,7 +80,7 @@
     "postpublish": "run-s gh-pages:demo gh-pages:deploy gh-pages:clean",
     "watch": "webpack --progress --watch"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "directories": {
     "test": "test"
   }
