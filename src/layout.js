@@ -14,8 +14,13 @@ function DagreLayout( options ){
 DagreLayout.prototype.run = function(){
   var options = this.options;
   var layout = this;
-
+  var runonce = false;
   var cy = options.cy; // cy is automatically populated for us in the constructor
+  if( typeof DagreLayout.runonce == 'undefined' ) {
+        DagreLayout.runonce = false;
+    }
+  if (!DagreLayout.runonce)
+  {
   
           cy.style([
           {
@@ -40,8 +45,8 @@ DagreLayout.prototype.run = function(){
               "line-color": "#88c0d0",
               "target-arrow-color": "#88c0d0",
               "curve-style": "taxi",
-              "taxi-direction": "downward",
-              "taxi-turn": "-59px"
+              "taxi-direction": "vertical",
+              "taxi-turn": "100%"
             }
           }
         ]);
@@ -293,6 +298,7 @@ DagreLayout.prototype.run = function(){
                   nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
                   nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
                   roots[i].scratch("xMax", nodes[j]._private.position.x);
+				  nodes[j].style("taxi-turn", 200*row + "px");
                   if (firstNode) {
                     roots[i].scratch("xMin", nodes[j]._private.position.x);
                     firstNode = false;
@@ -400,7 +406,8 @@ DagreLayout.prototype.run = function(){
 	}
 
   //this._private.cy.fit();
-   
+  }
+  DagreLayout.runonce = true;
   return this; // chaining
 };
 
