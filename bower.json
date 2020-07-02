@@ -1,6 +1,6 @@
 {
-  "name": "cytoscape-dagre-multi",
-  "description": "The Dagre layout for DAGs and trees for Cytoscape.js",
+  "name": "cytoscape-multilayer",
+  "description": "The multilayer layout for DAGs and trees for Cytoscape.js",
   "main": "cytoscape-dagre-multi.js",
   "dependencies": {
     "cytoscape": "^3.2.0"

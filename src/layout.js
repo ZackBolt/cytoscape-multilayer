@@ -2,7 +2,7 @@ const isFunction = function(o){ return typeof o === 'function'; };
 const defaults = require('./defaults');
 const assign = require('./assign');
 const dagre = require('dagre');
-const potpack = require('potpack');
+const potpackweighted = require('potpack-weighted');
 
 // constructor
 // options : object containing layout options
@@ -45,7 +45,7 @@ DagreLayout.prototype.run = function(){
               "line-color": "#88c0d0",
               "target-arrow-color": "#88c0d0",
               "curve-style": "taxi",
-              "taxi-direction": "vertical",
+              "taxi-direction": "horizontal",
               "taxi-turn": "100%"
             }
           }
@@ -118,7 +118,7 @@ DagreLayout.prototype.run = function(){
     var node = nodes[i];
     var nbb = node.layoutDimensions(options);
 
-    g.setNode(node.id(), {
+    g.setNode(node.id(), { 
       width: nbb.w,
       height: nbb.h,
       name: node.id()
@@ -216,9 +216,11 @@ DagreLayout.prototype.run = function(){
 		roots[i].scratch('moved', true);
 	
 	for (var i = 0; i < roots.size(); i++) { //label each successor with the id of one of it's parents
-      var successors = roots[i].successors();       
+      roots[i].scratch('weight', Math.random()); //assign a random weight for now
+	  var successors = roots[i].successors();
 		if (successors.size() > 0){
 			for (var k = 0; k < successors.size(); k++) {
+				successors[i].scratch('weight', Math.random()); //assign a random weight for now
 				if (successors[k]._private.scratch.moved !== true) {
 					successors[k].scratch('moved', true);
 					successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
@@ -228,89 +230,88 @@ DagreLayout.prototype.run = function(){
 	}
   //caleb's code here
           for (var i = 0; i < roots.size(); i++) {
-          var successors = roots[i].successors();
-          var edges = roots[i].successors();
-          var n = 0,
-            nodeCount = 0;
+			var successors = roots[i].successors();
+			var edges = roots[i].successors();
+			var n = 0,
+				nodeCount = 0;
 
-          for (var m = 0; m < successors.size(); m++) {
-            if (successors[m]._private.group == "nodes") {
-              successors[n] = successors[m];
-              n++;
-            } else if (successors[m]._private.group == "edges") {
-              edges[n] = edges[m];
-              nodeCount++;
-            }
-          }
+			for (var m = 0; m < successors.size(); m++) {
+				if (successors[m]._private.group == "nodes") {
+				successors[n] = successors[m];
+				n++;
+				} else if (successors[m]._private.group == "edges") {
+				edges[n] = edges[m];
+				nodeCount++;
+				}
+			}
 
-          nodes = successors.slice(0, n + 1);
-          edges = edges.slice(0, nodeCount + 1);
-          var containInPrevRoot = (targetID, roots) => {
-            for (var b = 0; b < i; b++) {
-              let successors = roots[b].successors();
-              for (var a = 0; a < successors.size(); a++) {
-                if (successors[a]._private.data.id == targetID) {
-                  roots[b]._private.scratch.prevSharedNodes += 1;
-                  return true;
-                }
-              }
-            }
-            return false;
-          };
-
-          var sharedCount = 0;
+			nodes = successors.slice(0, n + 1);
+			edges = edges.slice(0, nodeCount + 1);
+			var containInPrevRoot = (targetID, roots) => {
+				for (var b = 0; b < i; b++) {
+				let successors = roots[b].successors();
+				successors.sort(function (a, b) { return b._private.scratch.weight - a._private.scratch.weight; });
+				for (var a = 0; a < successors.size(); a++) {
+					if (successors[a]._private.data.id == targetID) {
+					roots[b]._private.scratch.prevSharedNodes += 1;
+					return true;
+					}
+				}
+				}
+				return false;
+			};
+			var sharedCount = 0;
 		  
  // If node appears in prev roots, it sets current root to node as bezier curve
-          for (var x = 0; x < nodeCount; x++) {
-            if (i > 0) {
-              let successors = roots[i - 1].successors();
-              for (var a = 0; a < successors.size(); a++) {
-                if (
-                  successors[a]._private.data.id ==
-                  edges[x]._private.data.target
-                ) {
-                  sharedCount++;
-                }
-              }
-            }
-            if (containInPrevRoot(edges[x]._private.data.target, roots)) {
-              edges[x].style("curve-style", "unbundled-bezier");
-            }
-          }
+			for (var x = 0; x < nodeCount; x++) {
+				if (i > 0) {
+				let successors = roots[i - 1].successors();
+				for (var a = 0; a < successors.size(); a++) {
+					if (
+					successors[a]._private.data.id ==
+					edges[x]._private.data.target
+					) {
+					sharedCount++;
+					}
+				}
+				}
+				if (containInPrevRoot(edges[x]._private.data.target, roots)) {
+				edges[x].style("curve-style", "unbundled-bezier");
+				}
+			}
 
-          if (n > 0) {
-            var nodesPerColumn = nearest_sqrt(n - sharedCount);
-            var topLeftSuccessorY = roots[i]._private.position.y + 100;
-            var topLeftSuccessorX = roots[i]._private.position.x;			//nodesPerColumn is sqrt rounded down
-            var j = 0;
-            var row = 0;
-            var firstNode = true;
-            while (j < n) {
-              for (var k = 0; k < nodesPerColumn && j < n; k++) {
-                if (
-                  nodes[j]._private.scratch.root == roots[i]._private.data.id &&
-                  !containInPrevRoot(nodes[j]._private.data.id, roots)
-                ) {
-                  nodes[j].position("y", topLeftSuccessorY + k * 100);
-                  nodes[j].position("x", topLeftSuccessorX + 200 * row);
-                  nodes[j].scratch("x1", topLeftSuccessorX + 200 * row); //update bodybounds));
-                  nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
-                  nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
-                  nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
-                  roots[i].scratch("xMax", nodes[j]._private.position.x);
-				  nodes[j].style("taxi-turn", 200*row + "px");
-                  if (firstNode) {
-                    roots[i].scratch("xMin", nodes[j]._private.position.x);
-                    firstNode = false;
-                  }
-                } else {
-                  k--;
-                }
-                j++;
-              }
-              row++;
-            }
-          }
+			if (n > 0) {
+				var nodesPerColumn = nearest_sqrt(n - sharedCount);
+				var topLeftSuccessorY = roots[i]._private.position.y + 100;
+				var topLeftSuccessorX = roots[i]._private.position.x;			//nodesPerColumn is sqrt rounded down
+				var j = 0;
+				var row = 0;
+				var firstNode = true;
+				while (j < n) {
+					for (var k = 0; k < nodesPerColumn && j < n; k++) {
+					if (
+					nodes[j]._private.scratch.root == roots[i]._private.data.id &&
+					!containInPrevRoot(nodes[j]._private.data.id, roots)
+					) {
+						nodes[j].position("y", topLeftSuccessorY + k * 100);
+						nodes[j].position("x", topLeftSuccessorX + 200 * row);
+						nodes[j].scratch("x1", topLeftSuccessorX + 200 * row); //update bodybounds));
+						nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
+						nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
+						nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
+						roots[i].scratch("xMax", nodes[j]._private.position.x);
+						if (firstNode) {
+							roots[i].scratch("xMin", nodes[j]._private.position.x);
+							firstNode = false;
+							}
+						} else {
+							k--;
+						}
+						j++;
+					}
+					row++;
+				}
+			}
         }
 		
 		//caleb's code ends
@@ -373,18 +374,21 @@ DagreLayout.prototype.run = function(){
 		roots[i].scratch('maxX', maxX);
 		roots[i].scratch('minY', minY);
 		roots[i].scratch('maxY', maxY);
+		//setting random weight here, normally would take it from arguments
+		
 	}
 	//curve styling here
 	
 	//Rectangle packing here
 	var boxes = [];
 	for (var i = 0; i < roots.size(); i++) { //create structure for potpack module
-		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX) + 150, h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY) + 150, root: i}); //potpack reorders the list so adding indicator for original root
+		boxes.push({w: (roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX) + 150, h: (roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY) + 150, root: i, weight: roots[i]._private.scratch.weight}); //potpack reorders the list so adding indicator for original root
 		}
 		
-	
-	const {w, h, fill} = potpack.default(boxes);
-	//console.log(boxes);	
+	console.log("pre");
+	const {w, h, fill} = potpackweighted.default(boxes);
+	console.log(boxes);
+	console.log("done");	
 	
 	for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
 	{

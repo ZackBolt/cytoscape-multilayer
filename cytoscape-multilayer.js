@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("dagre"), require("potpack"));
+		module.exports = factory(require("dagre"), require("potpack-weighted"));
 	else if(typeof define === 'function' && define.amd)
-		define(["dagre", "potpack"], factory);
+		define(["dagre", "potpack-weighted"], factory);
 	else if(typeof exports === 'object')
-		exports["cytoscapeDagreMulti"] = factory(require("dagre"), require("potpack"));
+		exports["cytoscapeMultilayer"] = factory(require("dagre"), require("potpack-weighted"));
 	else
-		root["cytoscapeDagreMulti"] = factory(root["dagre"], root["potpack"]);
+		root["cytoscapeMultilayer"] = factory(root["dagre"], root["potpack-weighted"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -91,7 +91,7 @@ var isFunction = function isFunction(o) {
 var defaults = __webpack_require__(2);
 var assign = __webpack_require__(1);
 var dagre = __webpack_require__(4);
-var potpack = __webpack_require__(5);
+var potpackweighted = __webpack_require__(5);
 
 // constructor
 // options : object containing layout options
@@ -131,7 +131,7 @@ DagreLayout.prototype.run = function () {
         "line-color": "#88c0d0",
         "target-arrow-color": "#88c0d0",
         "curve-style": "taxi",
-        "taxi-direction": "vertical",
+        "taxi-direction": "horizontal",
         "taxi-turn": "100%"
       }
     }]);
@@ -304,9 +304,11 @@ DagreLayout.prototype.run = function () {
       roots[i].scratch('moved', true);
     }for (var i = 0; i < roots.size(); i++) {
       //label each successor with the id of one of it's parents
+      roots[i].scratch('weight', Math.random()); //assign a random weight for now
       var successors = roots[i].successors();
       if (successors.size() > 0) {
         for (var k = 0; k < successors.size(); k++) {
+          successors[i].scratch('weight', Math.random()); //assign a random weight for now
           if (successors[k]._private.scratch.moved !== true) {
             successors[k].scratch('moved', true);
             successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
@@ -336,6 +338,9 @@ DagreLayout.prototype.run = function () {
       var containInPrevRoot = function containInPrevRoot(targetID, roots) {
         for (var b = 0; b < i; b++) {
           var _successors = roots[b].successors();
+          _successors.sort(function (a, b) {
+            return b._private.scratch.weight - a._private.scratch.weight;
+          });
           for (var a = 0; a < _successors.size(); a++) {
             if (_successors[a]._private.data.id == targetID) {
               roots[b]._private.scratch.prevSharedNodes += 1;
@@ -345,7 +350,6 @@ DagreLayout.prototype.run = function () {
         }
         return false;
       };
-
       var sharedCount = 0;
 
       // If node appears in prev roots, it sets current root to node as bezier curve
@@ -380,7 +384,6 @@ DagreLayout.prototype.run = function () {
               nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
               nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
               roots[i].scratch("xMax", nodes[j]._private.position.x);
-              nodes[j].style("taxi-turn", 200 * row + "px");
               if (firstNode) {
                 roots[i].scratch("xMin", nodes[j]._private.position.x);
                 firstNode = false;
@@ -450,6 +453,7 @@ DagreLayout.prototype.run = function () {
       roots[i].scratch('maxX', maxX);
       roots[i].scratch('minY', minY);
       roots[i].scratch('maxY', maxY);
+      //setting random weight here, normally would take it from arguments
     }
     //curve styling here
 
@@ -457,14 +461,19 @@ DagreLayout.prototype.run = function () {
     var boxes = [];
     for (var i = 0; i < roots.size(); i++) {
       //create structure for potpack module
-      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i }); //potpack reorders the list so adding indicator for original root
+      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i, weight: roots[i]._private.scratch.weight }); //potpack reorders the list so adding indicator for original root
     }
 
-    var _potpack$default = potpack.default(boxes),
-        w = _potpack$default.w,
-        h = _potpack$default.h,
-        fill = _potpack$default.fill;
-    //console.log(boxes);	
+    console.log("pre");
+	console.log(potpackweighted);
+
+    var _potpackweighted$defa = potpackweighted.default(boxes),
+        w = _potpackweighted$defa.w,
+        h = _potpackweighted$defa.h,
+        fill = _potpackweighted$defa.fill;
+
+    console.log(boxes);
+    console.log("done");
 
     for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
     {
@@ -573,7 +582,7 @@ var register = function register(cytoscape) {
     return;
   } // can't register if cytoscape unspecified
 
-  cytoscape('layout', 'dagre', impl); // register with cytoscape.js
+  cytoscape('layout', 'multilayer', impl); // register with cytoscape.js
 };
 
 if (typeof cytoscape !== 'undefined') {
