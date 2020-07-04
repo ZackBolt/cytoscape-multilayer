@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("dagre"), require("potpack-weighted"));
+		module.exports = factory(require("dagre"), require("potpackweighted"));
 	else if(typeof define === 'function' && define.amd)
-		define(["dagre", "potpack-weighted"], factory);
+		define(["dagre", "potpackweighted"], factory);
 	else if(typeof exports === 'object')
-		exports["cytoscapeMultilayer"] = factory(require("dagre"), require("potpack-weighted"));
+		exports["cytoscapeMultilayer"] = factory(require("dagre"), require("potpackweighted"));
 	else
-		root["cytoscapeMultilayer"] = factory(root["dagre"], root["potpack-weighted"]);
+		root["cytoscapeMultilayer"] = factory(root["dagre"], root["potpackweighted"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -453,7 +453,7 @@ DagreLayout.prototype.run = function () {
       roots[i].scratch('maxX', maxX);
       roots[i].scratch('minY', minY);
       roots[i].scratch('maxY', maxY);
-      //setting random weight here, normally would take it from arguments
+      //setting random weight here, normally would take it from use
     }
     //curve styling here
 
@@ -465,7 +465,6 @@ DagreLayout.prototype.run = function () {
     }
 
     console.log("pre");
-	console.log(potpackweighted);
 
     var _potpackweighted$defa = potpackweighted.default(boxes),
         w = _potpackweighted$defa.w,

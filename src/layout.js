@@ -2,7 +2,8 @@ const isFunction = function(o){ return typeof o === 'function'; };
 const defaults = require('./defaults');
 const assign = require('./assign');
 const dagre = require('dagre');
-const potpackweighted = require('potpack-weighted');
+const potpackweighted = require('potpackweighted');
+//import potpackweighted from 'potpackweighted";
 
 // constructor
 // options : object containing layout options
