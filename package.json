@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "dagre": "^0.8.2",
-    "potpack-weighted": "^0.1.0"
+    "potpackweighted": "^1.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

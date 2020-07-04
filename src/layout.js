@@ -3,6 +3,7 @@ const defaults = require('./defaults');
 const assign = require('./assign');
 const dagre = require('dagre');
 const potpackweighted = require('potpack-weighted');
+//import potpackweighted from 'potpack-weighted";
 
 // constructor
 // options : object containing layout options
