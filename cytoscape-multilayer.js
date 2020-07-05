@@ -338,6 +338,8 @@ DagreLayout.prototype.run = function () {
       var containInPrevRoot = function containInPrevRoot(targetID, roots) {
         for (var b = 0; b < i; b++) {
           var _successors = roots[b].successors();
+          console.log(_successors[0].weight);
+          console.log(_successors[0]._private.scratch.weight);
           _successors.sort(function (a, b) {
             return b._private.scratch.weight - a._private.scratch.weight;
           });
@@ -453,7 +455,7 @@ DagreLayout.prototype.run = function () {
       roots[i].scratch('maxX', maxX);
       roots[i].scratch('minY', minY);
       roots[i].scratch('maxY', maxY);
-      //setting random weight here, normally would take it from use
+      //setting random weight here, normally would take it from arguments
     }
     //curve styling here
 

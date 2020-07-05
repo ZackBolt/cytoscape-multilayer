@@ -3,7 +3,6 @@ const defaults = require('./defaults');
 const assign = require('./assign');
 const dagre = require('dagre');
 const potpackweighted = require('potpackweighted');
-//import potpackweighted from 'potpackweighted";
 
 // constructor
 // options : object containing layout options
@@ -251,6 +250,8 @@ DagreLayout.prototype.run = function(){
 			var containInPrevRoot = (targetID, roots) => {
 				for (var b = 0; b < i; b++) {
 				let successors = roots[b].successors();
+				console.log(successors[0].weight);
+				console.log(successors[0]._private.scratch.weight);
 				successors.sort(function (a, b) { return b._private.scratch.weight - a._private.scratch.weight; });
 				for (var a = 0; a < successors.size(); a++) {
 					if (successors[a]._private.data.id == targetID) {
