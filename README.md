@@ -1,6 +1,7 @@
 cytoscape-multilayer
 ================================================================================
-
+WORK IN PROGRESS
+PRODUCT IS NOT FUNCTIONAL YET
 ## Description
 
 Modified version of [cytoscape.js-dagre](https://github.com/cytoscape/cytoscape.js-dagre) to handle graphs with multiple connected components.
