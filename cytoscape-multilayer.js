@@ -303,6 +303,9 @@ DagreLayout.prototype.run = function () {
       //don't allow the roots to move as successors
 	  roots[i].scratch('weight', Math.random()); //assign a random weight for now
       roots[i].scratch('moved', true);
+	  var successors = roots[i].successors();
+	  for (var j = 0; j < successors.size(); j++)
+		  successors[j].scratch('weight', Math.random()); //assign a random weight for now
     }
 	roots = roots.sort(function (a, b) {
 		  return b._private.scratch.weight - a._private.scratch.weight;
@@ -347,9 +350,7 @@ DagreLayout.prototype.run = function () {
       edges = edges.slice(0, nodeCount + 1);
       var containInPrevRoot = function containInPrevRoot(targetID, roots) {
         for (var b = 0; b < i; b++) {
-          var _successors = roots[b].successors().sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
+          var _successors = roots[b].successors();
 //          console.log(_successors[0]._private.scratch.weight);
           for (var a = 0; a < _successors.size(); a++) {
             if (_successors[a]._private.data.id == targetID) {
