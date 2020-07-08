@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "dagre": "^0.8.2",
-    "potpackweighted": "^1.0.1"
+    "potpackweighted": "^1.0.2"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
@@ -46,6 +46,6 @@
     "cytoscape",
     "layout"
   ],
-  "author": "modified by Zachary Bolt",
+  "author": "Zachary Bolt",
   "license": "ISC"
 }
