@@ -199,7 +199,7 @@ DagreLayout.prototype.run = function () {
     });
 
     // add nodes to dagre
-    var nodes = eles.nodes();
+    var nodes = eles.nodes().sort();
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       var nbb = node.layoutDimensions(options);
@@ -285,8 +285,15 @@ DagreLayout.prototype.run = function () {
     var nearest_sqrt = function nearest_sqrt(n) {
       return Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
     };
-
-    nodes.layoutPositions(layout, options, function (ele) {
+	
+	var highest_weight = function highest_weight(a, b) {
+		  if (b._private.data.weight == undefined)
+			  b._private.data.weight = 0;
+		  if (a._private.data.weight == undefined)
+			  a._private.data.weight = 0
+			return b._private.data.weight - a._private.data.weight;
+      };
+		nodes.layoutPositions(layout, options, function (ele) {
       ele = (typeof ele === 'undefined' ? 'undefined' : _typeof(ele)) === "object" ? ele : this;
       var dModel = ele.scratch().dagre;
 
@@ -297,42 +304,23 @@ DagreLayout.prototype.run = function () {
     });
     //   this._private.cy.elements().roots()
     var maxWidth = 6000;
-    var roots = this._private.cy.elements().roots();
+    var roots = this._private.cy.elements().roots().sort(highest_weight);
     this._private.cy.elements().scratch('moved', false);
-    for (var i = 0; i < roots.size(); i++) {
-      //don't allow the roots to move as successors
-	  roots[i].scratch('weight', Math.random()); //assign a random weight for now
-      roots[i].scratch('moved', true);
-	  var successors = roots[i].successors();
-	  for (var j = 0; j < successors.size(); j++)
-		  successors[j].scratch('weight', Math.random()); //assign a random weight for now
-    }
-	roots = roots.sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
 	for (var i = 0; i < roots.size(); i++) {
+		//console.log(roots[i]._private.data.weight);
       //label each successor with the id of one of it's parents
-      var successors = roots[i].successors().sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
-	  for (var j = 0; j < successors.size(); j++)
-      if (successors.size() > 0) {
-        for (var k = 0; k < successors.size(); k++) {		  
-          if (successors[k]._private.scratch.moved !== true) {
-            successors[k].scratch('moved', true);
-            successors[k].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
-          }
-        }
-      }
+      var successors = roots[i].successors().sort(highest_weight);
+	  for (var j = 0; j < successors.size(); j++) {		  
+		if (successors[j]._private.scratch.moved !== true) {
+          successors[j].scratch('moved', true);
+          successors[j].scratch('root', roots[i]._private.data.id); //each successor will only have 1 root recorded in scratch, even if it is successor to multiple
+         }
+       }
     }
     //caleb's code here
     for (var i = 0; i < roots.size(); i++) {
-      var successors = roots[i].successors().sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
-      var edges = roots[i].successors().sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
+      var successors = roots[i].successors().sort(highest_weight);
+      var edges = roots[i].successors().sort(highest_weight);
       var n = 0,
           nodeCount = 0;
 
@@ -351,7 +339,6 @@ DagreLayout.prototype.run = function () {
       var containInPrevRoot = function containInPrevRoot(targetID, roots) {
         for (var b = 0; b < i; b++) {
           var _successors = roots[b].successors();
-//          console.log(_successors[0]._private.scratch.weight);
           for (var a = 0; a < _successors.size(); a++) {
             if (_successors[a]._private.data.id == targetID) {
               roots[b]._private.scratch.prevSharedNodes += 1;
@@ -366,9 +353,7 @@ DagreLayout.prototype.run = function () {
       // If node appears in prev roots, it sets current root to node as bezier curve
       for (var x = 0; x < nodeCount; x++) {
         if (i > 0) {
-          var _successors2 = roots[i - 1].successors().sort(function (a, b) {
-		  return b._private.scratch.weight - a._private.scratch.weight;
-      });
+          var _successors2 = roots[i - 1].successors().sort(highest_weight);
           for (var a = 0; a < _successors2.size(); a++) {
             if (_successors2[a]._private.data.id == edges[x]._private.data.target) {
               sharedCount++;
@@ -395,7 +380,6 @@ DagreLayout.prototype.run = function () {
               nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
               nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
               nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
-			  console.log(nodes[j]._private.data.label);
              // roots[i].scratch("xMax", nodes[j]._private.position.x);
               if (firstNode) {
               //  roots[i].scratch("xMin", nodes[j]._private.position.x);
@@ -473,7 +457,7 @@ DagreLayout.prototype.run = function () {
     var boxes = [];
     for (var i = 0; i < roots.size(); i++) {
       //create structure for potpack module
-      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i, weight: roots[i]._private.scratch.weight }); //potpack reorders the list so adding indicator for original root
+      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i, weight: roots[i]._data.scratch.weight }); //potpack reorders the list so adding indicator for original root
     }
     var _potpackweighted$defa = potpackweighted.default(boxes),
         w = _potpackweighted$defa.w,
