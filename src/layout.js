@@ -67,7 +67,7 @@ MultilayerLayout.prototype.run = function () {
       return isFunction(val) ? val.apply(ele, [ele]) : val;
     };
 
-	var nodes = eles.nodes().sort();
+	var nodes = eles.nodes().sort(highest_weight);
     var nearest_sqrt = function nearest_sqrt(n) {
       return Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
     };
