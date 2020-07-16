@@ -2,16 +2,14 @@ cytoscape-multilayer
 ================================================================================
 ## Description
 
-Modified version of [cytoscape.js-dagre](https://github.com/cytoscape/cytoscape.js-dagre) to handle graphs with multiple connected components.
 This is a layout extension for [Cytoscape.js](https://github.com/cytoscape/cytoscape.js).
 
-The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Chris Pettitt](https://www.linkedin.com/in/chrismpettitt).  It is especially suitable for DAGs and trees.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
-It has been heavily modified from the previous layout to also group children into boxes and add a maximum width for the graph.
+The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Zachary Bolt](https://ualr.edu/computerscience/zachary-bolt-b-sc-graduate-assistant-lecturer/).  It is especially suitable for DAGs and trees with large numbers of children.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
+It has been structured to also group children into boxes and add a maximum width for the graph.
 
 ## Dependencies
 
  * Cytoscape.js ^3.2.0
- * Dagre ^0.8.2
  * potpackweighted ^1.0.2
 
 
@@ -53,7 +51,7 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 
 ## API
-Some of the layout options are not supported or would have no effect as this layout is overriding most dagre functions.
+These are a holdover from templating this project from cytoscape-dagre module and are currently NON FUNCTIONING.  
 Call the layout, e.g. `cy.layout({ name: 'multilayer', ... }).run()`, with options:
 
 ```js
