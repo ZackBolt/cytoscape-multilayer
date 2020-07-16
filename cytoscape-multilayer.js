@@ -305,7 +305,6 @@ DagreLayout.prototype.run = function () {
     var roots = this._private.cy.elements().roots().sort(highest_weight);
     this._private.cy.elements().scratch('moved', false);
     for (var i = 0; i < roots.size(); i++) {
-      //console.log(roots[i]._private.data.weight);
       //label each successor with the id of one of it's parents
       var successors = roots[i].successors().sort(highest_weight);
       for (var j = 0; j < successors.size(); j++) {
@@ -448,7 +447,6 @@ DagreLayout.prototype.run = function () {
       roots[i].scratch('maxX', maxX);
       roots[i].scratch('minY', minY);
       roots[i].scratch('maxY', maxY);
-      //setting random weight here, normally would take it from arguments
     }
     //curve styling here
 

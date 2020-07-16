@@ -1,7 +1,5 @@
 cytoscape-multilayer
 ================================================================================
-WORK IN PROGRESS
-PRODUCT IS NOT FUNCTIONAL YET
 ## Description
 
 Modified version of [cytoscape.js-dagre](https://github.com/cytoscape/cytoscape.js-dagre) to handle graphs with multiple connected components.
@@ -14,6 +12,7 @@ It has been heavily modified from the previous layout to also group children int
 
  * Cytoscape.js ^3.2.0
  * Dagre ^0.8.2
+ * potpackweighted ^1.0.2
 
 
 ## Usage instructions
@@ -54,7 +53,7 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 
 ## API
-Some of the layout options are not supported or would have no effect as this is not using the dagre layout anymore.
+Some of the layout options are not supported or would have no effect as this layout is overriding most dagre functions.
 Call the layout, e.g. `cy.layout({ name: 'multilayer', ... }).run()`, with options:
 
 ```js
