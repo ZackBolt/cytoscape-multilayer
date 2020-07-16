@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("dagre"), require("potpackweighted"));
+		module.exports = factory(require("potpackweighted"));
 	else if(typeof define === 'function' && define.amd)
-		define(["dagre", "potpackweighted"], factory);
+		define(["potpackweighted"], factory);
 	else if(typeof exports === 'object')
-		exports["cytoscapeMultilayer"] = factory(require("dagre"), require("potpackweighted"));
+		exports["cytoscapeMultilayer"] = factory(require("potpackweighted"));
 	else
-		root["cytoscapeMultilayer"] = factory(root["dagre"], root["potpackweighted"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
+		root["cytoscapeMultilayer"] = factory(root["potpackweighted"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -83,33 +83,30 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var isFunction = function isFunction(o) {
   return typeof o === 'function';
 };
 var defaults = __webpack_require__(2);
 var assign = __webpack_require__(1);
-var dagre = __webpack_require__(4);
-var potpackweighted = __webpack_require__(5);
+var potpackweighted = __webpack_require__(4);
 
 // constructor
 // options : object containing layout options
-function DagreLayout(options) {
+function MultilayerLayout(options) {
   this.options = assign({}, defaults, options);
 }
 
 // runs the layout
-DagreLayout.prototype.run = function () {
+MultilayerLayout.prototype.run = function () {
   var options = this.options;
   var layout = this;
   var runonce = false;
   var cy = options.cy; // cy is automatically populated for us in the constructor
 
-  if (typeof DagreLayout.runonce == 'undefined') {
-    DagreLayout.runonce = false;
+  if (typeof MultilayerLayout.runonce == 'undefined') {
+    MultilayerLayout.runonce = false;
   }
-  if (!DagreLayout.runonce) {
+  if (!MultilayerLayout.runonce) {
 
     cy.style([{
       selector: "node",
@@ -157,131 +154,7 @@ DagreLayout.prototype.run = function () {
       return isFunction(val) ? val.apply(ele, [ele]) : val;
     };
 
-    var bb = options.boundingBox || { x1: 0, y1: 0, w: cy.width(), h: cy.height() };
-    if (bb.x2 === undefined) {
-      bb.x2 = bb.x1 + bb.w;
-    }
-    if (bb.w === undefined) {
-      bb.w = bb.x2 - bb.x1;
-    }
-    if (bb.y2 === undefined) {
-      bb.y2 = bb.y1 + bb.h;
-    }
-    if (bb.h === undefined) {
-      bb.h = bb.y2 - bb.y1;
-    }
-
-    var g = new dagre.graphlib.Graph({
-      multigraph: true,
-      compound: true
-    });
-
-    var gObj = {};
-    var setGObj = function setGObj(name, val) {
-      if (val != null) {
-        gObj[name] = val;
-      }
-    };
-
-    setGObj('nodesep', options.nodeSep);
-    setGObj('edgesep', options.edgeSep);
-    setGObj('ranksep', options.rankSep);
-    setGObj('rankdir', options.rankDir);
-    setGObj('ranker', options.ranker);
-
-    g.setGraph(gObj);
-
-    g.setDefaultEdgeLabel(function () {
-      return {};
-    });
-    g.setDefaultNodeLabel(function () {
-      return {};
-    });
-
-    // add nodes to dagre
     var nodes = eles.nodes().sort();
-    for (var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
-      var nbb = node.layoutDimensions(options);
-
-      g.setNode(node.id(), {
-        width: nbb.w,
-        height: nbb.h,
-        name: node.id()
-      });
-
-      // console.log( g.node(node.id()) );
-    }
-
-    // set compound parents
-    for (var _i = 0; _i < nodes.length; _i++) {
-      var _node = nodes[_i];
-
-      if (_node.isChild()) {
-        g.setParent(_node.id(), _node.parent().id());
-      }
-    }
-
-    // add edges to dagre
-    var edges = eles.edges().stdFilter(function (edge) {
-      return !edge.source().isParent() && !edge.target().isParent(); // dagre can't handle edges on compound nodes
-    });
-    for (var _i2 = 0; _i2 < edges.length; _i2++) {
-      var edge = edges[_i2];
-
-      g.setEdge(edge.source().id(), edge.target().id(), {
-        minlen: getVal(edge, options.minLen),
-        weight: getVal(edge, options.edgeWeight),
-        name: edge.id()
-      }, edge.id());
-
-      // console.log( g.edge(edge.source().id(), edge.target().id(), edge.id()) );
-    }
-
-    dagre.layout(g);
-
-    var gNodeIds = g.nodes();
-    for (var _i3 = 0; _i3 < gNodeIds.length; _i3++) {
-      var id = gNodeIds[_i3];
-      var n = g.node(id);
-
-      cy.getElementById(id).scratch().dagre = n;
-    }
-
-    var dagreBB = void 0;
-
-    if (options.boundingBox) {
-      dagreBB = { x1: Infinity, x2: -Infinity, y1: Infinity, y2: -Infinity };
-      nodes.forEach(function (node) {
-        var dModel = node.scratch().dagre;
-
-        dagreBB.x1 = Math.min(dagreBB.x1, dModel.x);
-        dagreBB.x2 = Math.max(dagreBB.x2, dModel.x);
-
-        dagreBB.y1 = Math.min(dagreBB.y1, dModel.y);
-        dagreBB.y2 = Math.max(dagreBB.y2, dModel.y);
-      });
-
-      dagreBB.w = dagreBB.x2 - dagreBB.x1;
-      dagreBB.h = dagreBB.y2 - dagreBB.y1;
-    } else {
-      dagreBB = bb;
-    }
-
-    var constrainPos = function constrainPos(p) {
-      if (options.boundingBox) {
-        var xPct = dagreBB.w === 0 ? 0 : (p.x - dagreBB.x1) / dagreBB.w;
-        var yPct = dagreBB.h === 0 ? 0 : (p.y - dagreBB.y1) / dagreBB.h;
-
-        return {
-          x: bb.x1 + xPct * bb.w,
-          y: bb.y1 + yPct * bb.h
-        };
-      } else {
-        return p;
-      }
-    };
-
     var nearest_sqrt = function nearest_sqrt(n) {
       return Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
     };
@@ -291,15 +164,6 @@ DagreLayout.prototype.run = function () {
       if (a._private.data.weight == undefined) a._private.data.weight = 0;
       return b._private.data.weight - a._private.data.weight;
     };
-    nodes.layoutPositions(layout, options, function (ele) {
-      ele = (typeof ele === 'undefined' ? 'undefined' : _typeof(ele)) === "object" ? ele : this;
-      var dModel = ele.scratch().dagre;
-
-      return constrainPos({
-        x: dModel.x,
-        y: dModel.y
-      });
-    });
     //   this._private.cy.elements().roots()
     var maxWidth = 6000;
     var roots = this._private.cy.elements().roots().sort(highest_weight);
@@ -314,7 +178,6 @@ DagreLayout.prototype.run = function () {
         }
       }
     }
-    //caleb's code here
     for (var i = 0; i < roots.size(); i++) {
       var successors = roots[i].successors().sort(highest_weight);
       var edges = roots[i].successors().sort(highest_weight);
@@ -322,7 +185,6 @@ DagreLayout.prototype.run = function () {
           nodeCount = 0;
 
       for (var m = 0; m < successors.size(); m++) {
-        //assign a random weight for now
         if (successors[m]._private.group == "nodes") {
           successors[n] = successors[m];
           n++;
@@ -392,47 +254,14 @@ DagreLayout.prototype.run = function () {
         }
       }
     }
-
-    //caleb's code ends
-    /*  for (var i = 0; i < roots.size(); i++)
-    	{
-        var successors = roots[i].successors();
-        if (successors.size()>0)
-        {
-          var nodesPerColumn = nearest_sqrt(successors.size());
-          var topLeftSuccessorY = roots[i]._private.position.y + nodesPerColumn*20;
-          var topLeftSuccessorX = roots[i]._private.position.x - (45*(successors.size()/nodesPerColumn)); //nodesPerColumn is sqrt rounded down
-          var j = 0;
-          var row = 0;
-          while (j<successors.size())
-          {
-            for (var k = 0; k < nodesPerColumn && (j<successors.size()); k++)
-            {
-    			if(successors[j]._private.scratch.root == roots[i]._private.data.id)
-    			{
-    				successors[j].position('y', topLeftSuccessorY + k*45);
-    				successors[j].position('x', topLeftSuccessorX + (130*row));
-    				successors[j].scratch('x1', (topLeftSuccessorX + (130*row) - 16)); //update bodybounds));
-    				successors[j].scratch('x2', (topLeftSuccessorX + (130*row) + 16)); //update bodybounds));
-    				successors[j].scratch('y1', (topLeftSuccessorY + k*45 - 16));
-    				successors[j].scratch('y2', (topLeftSuccessorY + k*45 + 16));
-    			}
-              j++;
-            }
-            row++;
-          }
-        }
-      }
-      */
-
-    //console.log(roots);
-
     for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
     {
-      var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
-      var maxX = roots[i]._private.bodyBounds.x2; //uses the root node's bounding box to start with
-      var minY = roots[i]._private.bodyBounds.y1;
-      var maxY = roots[i]._private.bodyBounds.y2;
+      console.log(roots[i].successors());
+      //var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
+      var minX = roots[i]._private.position.x - roots[i].numericStyle('width') / 2;
+      var maxX = roots[i]._private.position.x + roots[i].numericStyle('width') / 2; //uses the root node's bounding box to start with
+      var minY = roots[i]._private.position.y - roots[i].numericStyle('height') / 2;
+      var maxY = roots[i]._private.position.y - roots[i].numericStyle('height') / 2;
       successors = roots[i].successors();
       for (var k = 0; k < successors.size(); k++) {
         if (successors[k]._private.scratch.root == roots[i]._private.data.id) //if successor has this root node recorded as 'root'  in scratch
@@ -481,11 +310,11 @@ DagreLayout.prototype.run = function () {
 
     //this._private.cy.fit();
   }
-  DagreLayout.runonce = true;
+  MultilayerLayout.runonce = true;
   return this; // chaining
 };
 
-module.exports = DagreLayout;
+module.exports = MultilayerLayout;
 
 /***/ }),
 /* 1 */
@@ -583,12 +412,6 @@ module.exports = register;
 /***/ (function(module, exports) {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
 
 /***/ })
 /******/ ]);

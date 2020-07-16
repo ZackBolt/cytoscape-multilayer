@@ -21,7 +21,6 @@
     "url": "https://eac-fs-0.host.ualr.edu/zdbolt/cytoscape-multilayer.git"
   },
   "dependencies": {
-    "dagre": "^0.8.2",
     "potpackweighted": "^1.0.2"
   },
   "devDependencies": {
