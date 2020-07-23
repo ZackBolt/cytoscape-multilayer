@@ -78,7 +78,7 @@ MultilayerLayout.prototype.run = function () {
       return b._private.data.weight - a._private.data.weight;
     };
     //   this._private.cy.elements().roots()
-    var maxWidth = 6000;
+    var maxWidth = options.layoutWidth;
     var roots = this._private.cy.elements().roots().sort(highest_weight);
     this._private.cy.elements().scratch('moved', false);
     for (var i = 0; i < roots.size(); i++) {
@@ -147,13 +147,12 @@ MultilayerLayout.prototype.run = function () {
         while (j < n) {
           for (var k = 0; k < nodesPerColumn && j < n; k++) {
             if (nodes[j]._private.scratch.root == roots[i]._private.data.id && !containInPrevRoot(nodes[j]._private.data.id, roots)) {
-              nodes[j].position("y", topLeftSuccessorY + k * 100);
-              nodes[j].position("x", topLeftSuccessorX + 200 * row);
-              nodes[j].scratch("x1", topLeftSuccessorX + 200 * row); //update bodybounds));
-              nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
-              nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
-              nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
-              // roots[i].scratch("xMax", nodes[j]._private.position.x);
+              nodes[j].position("y", topLeftSuccessorY + k * options.nodeYSep);
+              nodes[j].position("x", topLeftSuccessorX + options.nodeXSep * row);
+              nodes[j].scratch("x1", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
+              nodes[j].scratch("x2", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
+              nodes[j].scratch("y1", topLeftSuccessorY + k * options.nodeYSep);
+              nodes[j].scratch("y2", topLeftSuccessorY + k * options.nodeYSep);
               if (firstNode) {
                 //  roots[i].scratch("xMin", nodes[j]._private.position.x);
                 firstNode = false;
@@ -169,7 +168,6 @@ MultilayerLayout.prototype.run = function () {
     }
     for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
     {
-	  console.log(roots[i].successors());
       //var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
 	  var minX = roots[i]._private.position.x - (roots[i].numericStyle('width'))/2;
       var maxX = roots[i]._private.position.x + (roots[i].numericStyle('width'))/2; //uses the root node's bounding box to start with
@@ -196,7 +194,7 @@ MultilayerLayout.prototype.run = function () {
     var boxes = [];
     for (var i = 0; i < roots.size(); i++) {
       //create structure for potpack module
-      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
+      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + options.groupSep, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + options.groupSep, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
     }
     var _potpackweighted$defa = potpackweighted.default(boxes),
         w = _potpackweighted$defa.w,

@@ -165,7 +165,7 @@ MultilayerLayout.prototype.run = function () {
       return b._private.data.weight - a._private.data.weight;
     };
     //   this._private.cy.elements().roots()
-    var maxWidth = 6000;
+    var maxWidth = options.layoutWidth;
     var roots = this._private.cy.elements().roots().sort(highest_weight);
     this._private.cy.elements().scratch('moved', false);
     for (var i = 0; i < roots.size(); i++) {
@@ -234,13 +234,12 @@ MultilayerLayout.prototype.run = function () {
         while (j < n) {
           for (var k = 0; k < nodesPerColumn && j < n; k++) {
             if (nodes[j]._private.scratch.root == roots[i]._private.data.id && !containInPrevRoot(nodes[j]._private.data.id, roots)) {
-              nodes[j].position("y", topLeftSuccessorY + k * 100);
-              nodes[j].position("x", topLeftSuccessorX + 200 * row);
-              nodes[j].scratch("x1", topLeftSuccessorX + 200 * row); //update bodybounds));
-              nodes[j].scratch("x2", topLeftSuccessorX + 200 * row); //update bodybounds));
-              nodes[j].scratch("y1", topLeftSuccessorY + k * 100);
-              nodes[j].scratch("y2", topLeftSuccessorY + k * 100);
-              // roots[i].scratch("xMax", nodes[j]._private.position.x);
+              nodes[j].position("y", topLeftSuccessorY + k * options.nodeYSep);
+              nodes[j].position("x", topLeftSuccessorX + options.nodeXSep * row);
+              nodes[j].scratch("x1", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
+              nodes[j].scratch("x2", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
+              nodes[j].scratch("y1", topLeftSuccessorY + k * options.nodeYSep);
+              nodes[j].scratch("y2", topLeftSuccessorY + k * options.nodeYSep);
               if (firstNode) {
                 //  roots[i].scratch("xMin", nodes[j]._private.position.x);
                 firstNode = false;
@@ -256,7 +255,6 @@ MultilayerLayout.prototype.run = function () {
     }
     for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
     {
-      console.log(roots[i].successors());
       //var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
       var minX = roots[i]._private.position.x - roots[i].numericStyle('width') / 2;
       var maxX = roots[i]._private.position.x + roots[i].numericStyle('width') / 2; //uses the root node's bounding box to start with
@@ -283,7 +281,7 @@ MultilayerLayout.prototype.run = function () {
     var boxes = [];
     for (var i = 0; i < roots.size(); i++) {
       //create structure for potpack module
-      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + 150, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + 150, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
+      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + options.groupSep, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + options.groupSep, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
     }
     var _potpackweighted$defa = potpackweighted.default(boxes),
         w = _potpackweighted$defa.w,
@@ -347,35 +345,10 @@ module.exports = Object.assign != null ? Object.assign.bind(Object) : function (
 
 
 var defaults = {
-  // dagre algo options, uses default value on undefined
-  nodeSep: undefined, // the separation between adjacent nodes in the same rank
-  edgeSep: undefined, // the separation between adjacent edges in the same rank
-  rankSep: undefined, // the separation between adjacent nodes in the same rank
-  rankDir: undefined, // 'TB' for top to bottom flow, 'LR' for left to right,
-  ranker: undefined, // Type of algorithm to assigns a rank to each node in the input graph.
-  // Possible values: network-simplex, tight-tree or longest-path
-  minLen: function minLen(edge) {
-    return 1;
-  }, // number of ranks to keep between the source and target of the edge
-  edgeWeight: function edgeWeight(edge) {
-    return 1;
-  }, // higher weight edges are generally made shorter and straighter than lower weight edges
-
-  // general layout options
-  fit: true, // whether to fit to viewport
-  padding: 30, // fit padding
-  spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
-  nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
-  animate: false, // whether to transition the node positions
-  animateFilter: function animateFilter(node, i) {
-    return true;
-  }, // whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
-  animationDuration: 500, // duration of animation in ms if enabled
-  animationEasing: undefined, // easing of animation if enabled
-  boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-  transform: function transform(node, pos) {
-    return pos;
-  }, // a function that applies a transform to the final node position
+  nodeXSep: 200, // the X axis space between adjacent nodes in the same rank
+  nodeYSep: 100, // the Y axis space between adjacent nodes in the same rank
+  groupSep: 150, // the space between adjacent parent/children groups
+  layoutWidth: 6000, //the maximum width of the layout
   ready: function ready() {}, // on layoutready
   stop: function stop() {} // on layoutstop
 };
