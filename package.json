@@ -1,6 +1,6 @@
 {
   "name": "cytoscape-multilayer",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "The multilayer layout for DAGs and trees for Cytoscape.js",
   "main": "cytoscape-multilayer.js",
   "scripts": {
