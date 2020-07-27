@@ -4,7 +4,7 @@ cytoscape-multilayer
 
 This is a layout extension for [Cytoscape.js](https://github.com/cytoscape/cytoscape.js).
 
-The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Zachary Bolt](https://ualr.edu/computerscience/zachary-bolt-b-sc-graduate-assistant-lecturer/). Contributions from Caleb Chase and Mark Barnes.  It is especially suitable for DAGs and trees with large numbers of children.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
+The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Zachary Bolt](https://ualr.edu/computerscience/zachary-bolt-b-sc-graduate-assistant-lecturer/). Contributions from Caleb Chase and [Mark Barnes] (https://www.linkedin.com/in/mark-barnes-243b1529/) . It is especially suitable for DAGs and trees with large numbers of children.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
 It has been structured to also group children into boxes and add a maximum width for the graph.
 
 ## Dependencies
@@ -51,20 +51,16 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 
 ## API
-These are a holdover from templating this project from cytoscape-dagre module and are currently NON FUNCTIONING.  
 Call the layout, e.g. `cy.layout({ name: 'multilayer', ... }).run()`, with options:
 
 ```js
 var defaults = {
   // multilayer algo options, uses default value on undefined
-  DO BEFORE NEXT MEETING
-  *weight*: undefined, // undefined or string or a function, if string it's the name of the attribute on node (example could use "income" which would look for income attr.  If function uses that function to calculate weight.  Use typeof in js
   nodeXSep: 200, // the X axis space between adjacent nodes in the same rank
   nodeYSep: 100, // the Y axis space between adjacent nodes in the same rank
   groupSep: 150, // the space between adjacent parent/children groups
   layoutWidth: 6000, //the maximum width of the layout
-  ready: function ready() {}, // on layoutready
-  stop: function stop() {} // on layoutstop
+  weightFunction: function (a, b) {if(b == undefined && a == undefined) return 0; if (b._private.data.weight == undefined) b._private.data.weight = 0; if (a._private.data.weight == undefined) a._private.data.weight = 0; return b._private.data.weight - a._private.data.weight;}, //formula applied to each node to organize them by weight.  currently has error checking to avoid undefined errors.
 };
 ```
 
