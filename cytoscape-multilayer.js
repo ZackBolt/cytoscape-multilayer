@@ -153,17 +153,13 @@ MultilayerLayout.prototype.run = function () {
     var getVal = function getVal(ele, val) {
       return isFunction(val) ? val.apply(ele, [ele]) : val;
     };
+    var highest_weight = options.weightFunction();
 
     var nodes = eles.nodes().sort(highest_weight);
     var nearest_sqrt = function nearest_sqrt(n) {
       return Math.sqrt(Math.pow(Math.round(Math.sqrt(n)), 2));
     };
 
-    var highest_weight = function highest_weight(a, b) {
-      if (b._private.data.weight == undefined) b._private.data.weight = 0;
-      if (a._private.data.weight == undefined) a._private.data.weight = 0;
-      return b._private.data.weight - a._private.data.weight;
-    };
     //   this._private.cy.elements().roots()
     var maxWidth = options.layoutWidth;
     var roots = this._private.cy.elements().roots().sort(highest_weight);
@@ -349,6 +345,9 @@ var defaults = {
   nodeYSep: 100, // the Y axis space between adjacent nodes in the same rank
   groupSep: 150, // the space between adjacent parent/children groups
   layoutWidth: 6000, //the maximum width of the layout
+  weightFunction: function weightFunction(a, b) {
+    if (b == undefined && a == undefined) return 0;if (b._private.data.weight == undefined) b._private.data.weight = 0;if (a._private.data.weight == undefined) a._private.data.weight = 0;return b._private.data.weight - a._private.data.weight;
+  }, //formula applied to each node to organize them by weight.  currently has error checking to avoid undefined errors.
   ready: function ready() {}, // on layoutready
   stop: function stop() {} // on layoutstop
 };

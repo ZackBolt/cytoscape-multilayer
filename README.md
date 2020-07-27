@@ -57,6 +57,7 @@ Call the layout, e.g. `cy.layout({ name: 'multilayer', ... }).run()`, with optio
 ```js
 var defaults = {
   // multilayer algo options, uses default value on undefined
+  DO BEFORE NEXT MEETING
   *weight*: undefined, // undefined or string or a function, if string it's the name of the attribute on node (example could use "income" which would look for income attr.  If function uses that function to calculate weight.  Use typeof in js
   nodeXSep: 200, // the X axis space between adjacent nodes in the same rank
   nodeYSep: 100, // the Y axis space between adjacent nodes in the same rank
