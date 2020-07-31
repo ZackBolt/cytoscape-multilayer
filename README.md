@@ -4,7 +4,7 @@ cytoscape-multilayer
 
 This is a layout extension for [Cytoscape.js](https://github.com/cytoscape/cytoscape.js).
 
-The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Zachary Bolt](https://ualr.edu/computerscience/zachary-bolt-b-sc-graduate-assistant-lecturer/). Contributions from Caleb Chase and [Mark Barnes] (https://www.linkedin.com/in/mark-barnes-243b1529/) . It is especially suitable for DAGs and trees with large numbers of children.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
+The `multilayer` layout organises the graph using a DAG (directed acyclic graph) system, written by [Zachary Bolt](https://ualr.edu/computerscience/zachary-bolt-b-sc-graduate-assistant-lecturer/). Contributions from [Caleb Chase] (http://www.linkedin.com/in/calebchase03) and [Mark Barnes] (https://www.linkedin.com/in/mark-barnes-243b1529/) . It is especially suitable for DAGs and trees with large numbers of children.  For more information, please refer to its [Dagre's documentation](https://github.com/cpettitt/dagre).
 It has been structured to also group children into boxes and add a maximum width for the graph.
 
 ## Dependencies
