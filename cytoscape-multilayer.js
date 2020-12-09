@@ -109,19 +109,7 @@ MultilayerLayout.prototype.run = function () {
   if (!MultilayerLayout.runonce) {
 
     cy.style([{
-      selector: "node",
-      style: {
-        "background-color": "#3b4252",
-        label: "data(label)",
-        "text-valign": "center",
-        color: "#eceff4",
-        "text-outline-color": "#3b4252",
-        "text-outline-opacity": "0.75",
-        "text-wrap": "ellipsis",
-        "text-max-width": "250px",
-        "text-outline-width": "2px"
-      }
-    }, {
+
       selector: "edge",
       style: {
         width: 3,
@@ -132,21 +120,22 @@ MultilayerLayout.prototype.run = function () {
         "taxi-direction": "horizontal",
         "taxi-turn": "100%"
       }
-    }]);
+    }]).update();
 
     // Colors for node selection
-    var color = {
-      node: {
-        root: {
-          selected: "#bf616a",
-          notSelected: "#3b4252"
-        },
-        child: {
-          selected: "#a3be8c",
-          notSelected: "#3b4252"
-        }
-      }
-    };
+    /*
+       var color = {
+         node: {
+           root: {
+             selected: "#bf616a",
+             notSelected: "#3b4252"
+           },
+           child: {
+             selected: "#a3be8c",
+             notSelected: "#3b4252"
+           }
+         }
+       };*/
 
     var eles = options.eles;
 
@@ -222,33 +211,57 @@ MultilayerLayout.prototype.run = function () {
       }
       if (n > 0) {
         var nodesPerColumn = nearest_sqrt(n - sharedCount);
-        var topLeftSuccessorY = roots[i]._private.position.y + 100;
-        var topLeftSuccessorX = roots[i]._private.position.x; //nodesPerColumn is sqrt rounded down
+        var topLeftSuccessorY = roots[i]._private.position.y + options.nodeYSep;
+        var topLeftSuccessorX = roots[i]._private.position.x + options.nodeXSep; //nodesPerColumn is sqrt rounded down
         var j = 0;
-        var row = 0;
-        var firstNode = true;
+        //var row = 0;
+        var lastColumnX2 = 0;
         while (j < n) {
           for (var k = 0; k < nodesPerColumn && j < n; k++) {
             if (nodes[j]._private.scratch.root == roots[i]._private.data.id && !containInPrevRoot(nodes[j]._private.data.id, roots)) {
+              var thisColumnX2 = 0 - options.nodeXSep;
+              if (nodes[j].isParent()) {
+                var childLeftSuccessorY = nodes[j]._private.position.y;
+                var childLeftSuccessorX = nodes[j]._private.position.x + options.nodeXSep; //nodesPerColumn is sqrt rounded down
+                for (var z = 0; z < nodes[j].children.length; z++) {
+                  if (z == 0) {
+                    nodes[j].children()[z].position("x", options.nodeXSep / 2 * nodes[j].children.length);
+                    nodes[j].children()[z].position("y", childLeftSuccessorY);
+                    nodes[j].children()[z].scratch("y1", childLeftSuccessorY); //update bodybounds));
+                    nodes[j].children()[z].scratch("y2", childLeftSuccessorY); //update bodybounds));
+                    nodes[j].children()[z].scratch("x1", options.nodeXSep / 2 * nodes[j].children.length);
+                    nodes[j].children()[z].scratch("x2", options.nodeXSep / 2 * nodes[j].children.length);
+                  } else {
+                    nodes[j].children()[z].position("x", childLeftSuccessorX + z * options.nodeXSep / 2);
+                    nodes[j].children()[z].position("y", childLeftSuccessorY + options.nodeYSep * 2);
+                    nodes[j].children()[z].scratch("y1", childLeftSuccessorY + options.nodeYSep * 2); //update bodybounds));
+                    nodes[j].children()[z].scratch("y2", childLeftSuccessorY + options.nodeYSep * 2); //update bodybounds));
+                    nodes[j].children()[z].scratch("x1", childLeftSuccessorX + z * options.nodeXSep / 2);
+                    nodes[j].children()[z].scratch("x2", childLeftSuccessorX + z * options.nodeXSep / 2);
+                  }
+                  if (nodes[j].children()[z]._private.scratch.x1 < nodes[j]._private.scratch.x1) nodes[j].scratch("x1", nodes[j].children()[z].scratch.x1);
+                  if (nodes[j].children()[z]._private.scratch.x2 > nodes[j]._private.scratch.x2) nodes[j].scratch("x2", nodes[j].children()[z].scratch.x2);
+                  if (nodes[j].children()[z]._private.scratch.y1 < nodes[j]._private.scratch.y1) nodes[j].scratch("y1", nodes[j].children()[z].scratch.y1);
+                  if (nodes[j].children()[z]._private.scratch.x2 > nodes[j]._private.scratch.y2) nodes[j].scratch("y2", nodes[j].children()[z].scratch.y2);
+                }
+              }
               nodes[j].position("y", topLeftSuccessorY + k * options.nodeYSep);
-              nodes[j].position("x", topLeftSuccessorX + options.nodeXSep * row);
-              nodes[j].scratch("x1", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
-              nodes[j].scratch("x2", topLeftSuccessorX + options.nodeXSep * row); //update bodybounds));
+              nodes[j].position("x", lastColumnX2 + options.nodeXSep + 100);
+              nodes[j].scratch("x1", lastColumnX2 + options.nodeXSep); //update bodybounds));
+              nodes[j].scratch("x2", lastColumnX2 + options.nodeXSep); //update bodybounds));
               nodes[j].scratch("y1", topLeftSuccessorY + k * options.nodeYSep);
               nodes[j].scratch("y2", topLeftSuccessorY + k * options.nodeYSep);
-              if (firstNode) {
-                //  roots[i].scratch("xMin", nodes[j]._private.position.x);
-                firstNode = false;
-              }
-            } else {
-              k--;
+              if (nodes[j].isParent()) k++;
+              if (thisColumnX2 < nodes[j]._private.scratch.x2) thisColumnX2 = nodes[j]._private.scratch.x2;
             }
             j++;
           }
-          row++;
+          //row++;
+          lastColumnX2 = thisColumnX2 + options.nodeXSep;
         }
       }
     }
+
     for (var i = 0; i < roots.size(); i++) //find out bounding boxes for each group of nodes
     {
       //var minX = roots[i]._private.bodyBounds.x1; //initialize variables to determine bounding box for root and it's children
@@ -271,13 +284,16 @@ MultilayerLayout.prototype.run = function () {
       roots[i].scratch('minY', minY);
       roots[i].scratch('maxY', maxY);
     }
+
     //curve styling here
 
     //Rectangle packing here
     var boxes = [];
     for (var i = 0; i < roots.size(); i++) {
-      //create structure for potpack module
-      boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + options.groupSep, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + options.groupSep, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
+      if (!roots[i].isChild()) {
+        //create structure for potpack module
+        boxes.push({ w: roots[i]._private.scratch.maxX - roots[i]._private.scratch.minX + options.groupSep * 5, h: roots[i]._private.scratch.maxY - roots[i]._private.scratch.minY + options.groupSep, root: i, weight: roots[i]._private.data.weight }); //potpack reorders the list so adding indicator for original root
+      }
     }
     var _potpackweighted$defa = potpackweighted.default(boxes),
         w = _potpackweighted$defa.w,
@@ -301,9 +317,13 @@ MultilayerLayout.prototype.run = function () {
         }
       }
     }
-
     //this._private.cy.fit();
   }
+
+  if (typeof MultilayerLayout.runonce == 'undefined') {
+    MultilayerLayout.runonce = false;
+  }
+  if (!MultilayerLayout.runonce) {}
   MultilayerLayout.runonce = true;
   return this; // chaining
 };
@@ -341,15 +361,13 @@ module.exports = Object.assign != null ? Object.assign.bind(Object) : function (
 
 
 var defaults = {
-  nodeXSep: 200, // the X axis space between adjacent nodes in the same rank
+  nodeXSep: 100, // the X axis space between adjacent nodes in the same rank
   nodeYSep: 100, // the Y axis space between adjacent nodes in the same rank
-  groupSep: 150, // the space between adjacent parent/children groups
+  groupSep: 100, // the space between adjacent parent/children groups
   layoutWidth: 6000, //the maximum width of the layout
   weightFunction: function weightFunction(a, b) {
     if (b == undefined && a == undefined) return 0;if (b._private.data.weight == undefined) b._private.data.weight = 0;if (a._private.data.weight == undefined) a._private.data.weight = 0;return b._private.data.weight - a._private.data.weight;
-  }, //formula applied to each node to organize them by weight.  currently has error checking to avoid undefined errors.
-  ready: function ready() {}, // on layoutready
-  stop: function stop() {} // on layoutstop
+  } //formula applied to each node to organize them by weight.  currently has error checking to avoid undefined errors.
 };
 
 module.exports = defaults;
