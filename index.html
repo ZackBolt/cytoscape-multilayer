@@ -1,19 +1,20 @@
 <!DOCTYPE>
 
 <html>
-
+<!-- Non functioning -->
   <head>
     <title>cytoscape-multilayer.js demo</title>
 
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-	<script src="https://unpkg.com/potpackweighted@1.0.2/index.mjs"></script>
+
     <!-- for testing with local version of cytoscape.js -->
     <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
 
     <script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script>
     <script src="cytoscape-multilayer.js"></script>
+	<script src="https://unpkg.com/potpackweighted@1.0.2/index.mjs"></script>
 
     <style>
       body {
@@ -45,7 +46,7 @@
           autounselectify: true,
 
           layout: {
-            name: 'multilayer'
+            name: 'multilayer', nodeXSep: '50', nodeYsep: '200'
           },
 
           style: [
